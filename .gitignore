@@ -1,0 +1,33 @@
+# Gradle and build outputs
+.gradle/
+build/
+**/build/
+captures/
+outputs/
+
+# Kotlin and annotation processing caches
+.kotlin/
+**/kspCaches/
+**/generated/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Local machine and SDK config
+local.properties
+
+# Signing keys and secrets
+*.jks
+*.keystore
+keystore.properties
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code local settings
+.vscode/
