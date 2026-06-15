@@ -98,7 +98,7 @@ fun CalendarMonthView(
                                             .size(6.dp)
                                             .clip(CircleShape)
                                             .background(
-                                                if (hasRun) MaterialTheme.colorScheme.tertiary else Color.Transparent
+                                                if (hasRun) Color(0xFF2E7D32) else Color.Transparent
                                             )
                                     )
                                 }

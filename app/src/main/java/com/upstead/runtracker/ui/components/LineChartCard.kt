@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -111,13 +112,31 @@ fun LineChartCard(
                         .height(180.dp)
                         .padding(top = 16.dp)
                         .pointerInput(points) {
+                            detectDragGestures(
+                                onDragStart = { offset ->
+                                    selectedIndex = nearestPointIndex(
+                                        touchX = offset.x,
+                                        width = size.width.toFloat(),
+                                        pointCount = points.size
+                                    )
+                                },
+                                onDrag = { change, _ ->
+                                    change.consume()
+                                    selectedIndex = nearestPointIndex(
+                                        touchX = change.position.x,
+                                        width = size.width.toFloat(),
+                                        pointCount = points.size
+                                    )
+                                }
+                            )
+                        }
+                        .pointerInput(points) {
                             detectTapGestures { tapOffset ->
-                                if (points.size < 2) return@detectTapGestures
-                                val chartWidth = size.width
-                                if (chartWidth <= 0f) return@detectTapGestures
-                                val step = chartWidth / (points.size - 1)
-                                val tapped = (tapOffset.x / step).roundToInt().coerceIn(0, points.lastIndex)
-                                selectedIndex = tapped
+                                selectedIndex = nearestPointIndex(
+                                    touchX = tapOffset.x,
+                                    width = size.width.toFloat(),
+                                    pointCount = points.size
+                                )
                             }
                         }
                 ) {
@@ -224,6 +243,12 @@ fun LineChartCard(
             }
         }
     }
+}
+
+private fun nearestPointIndex(touchX: Float, width: Float, pointCount: Int): Int {
+    if (pointCount < 2 || width <= 0f) return -1
+    val step = width / (pointCount - 1)
+    return (touchX / step).roundToInt().coerceIn(0, pointCount - 1)
 }
 
 private fun buildSparseDateIndices(total: Int): Set<Int> {
