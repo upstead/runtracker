@@ -22,8 +22,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.upstead.runtracker.model.Profile
 import com.upstead.runtracker.model.RunEntry
+import com.upstead.runtracker.model.RunType
+import com.upstead.runtracker.model.UnitPreferences
 import com.upstead.runtracker.util.bmi
+import com.upstead.runtracker.util.formatDistanceFromKm
 import com.upstead.runtracker.util.formatDuration
+import com.upstead.runtracker.util.formatSpeedFromKmPerHour
+import com.upstead.runtracker.util.formatWeightFromKg
 import com.upstead.runtracker.util.speedKmPerHour
 import com.upstead.runtracker.util.toDisplayDate
 
@@ -32,6 +37,7 @@ import com.upstead.runtracker.util.toDisplayDate
 fun RunDetailScreen(
     runEntry: RunEntry?,
     profile: Profile?,
+    unitPreferences: UnitPreferences,
     onBack: () -> Unit,
     onEdit: (date: String) -> Unit
 ) {
@@ -75,12 +81,12 @@ fun RunDetailScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(runEntry.date.toDisplayDate(), style = MaterialTheme.typography.titleLarge)
                     Text(
-                        text = "Weight: ${"%.1f".format(runEntry.weightKg)} kg",
+                        text = "Weight: ${formatWeightFromKg(runEntry.weightKg, unitPreferences.weightUnit)}",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(top = 12.dp)
                     )
                     Text(
-                        text = "Distance: ${"%.2f".format(runEntry.distanceKm)} km",
+                        text = "Distance: ${formatDistanceFromKm(runEntry.distanceKm, unitPreferences.distanceUnit)}",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
@@ -88,7 +94,11 @@ fun RunDetailScreen(
                         style = MaterialTheme.typography.bodyLarge
                     )
                     Text(
-                        text = "Average speed: ${"%.2f".format(avgSpeed)} km/h",
+                        text = "Average speed: ${formatSpeedFromKmPerHour(avgSpeed, unitPreferences.distanceUnit)}",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = "Run type: ${if (runEntry.runType == RunType.OUTDOOR) "Outdoor" else "Treadmill"}",
                         style = MaterialTheme.typography.bodyLarge
                     )
                     if (bmiValue != null) {

@@ -126,6 +126,8 @@ dependencies {
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.google.play.review)
+    implementation(libs.google.play.review.ktx)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

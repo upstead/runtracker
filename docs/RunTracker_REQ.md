@@ -1,211 +1,185 @@
-# RunTracker - Requirements Specification (V1)
+# RunTracker - Requirements Specification
 
 ## Overview
 
-RunTracker is a simple offline-first Android application for tracking running progress.
+RunTracker is a simple, local-first Android running journal for a single user.
 
-The application is designed for a single user and focuses on simplicity rather than advanced fitness analytics.
+Core principles:
 
-No user accounts, cloud sync, authentication, advertisements, social features, or online services will be included.
+- No authentication
+- No cloud sync
+- No ads
+- No social features
+- No gamification
+- Simple and uncluttered UI
 
-All data will be stored locally on the device.
-
----
-
-# Goals
-
-The application should allow the user to:
-
-- Track daily running activity.
-- Track body weight over time.
-- View running history using a calendar interface.
-- Visualize progress using charts.
-- Export and import data for backup and migration.
+All data is stored locally on device.
 
 ---
 
-# Non-Goals
+## Goals
 
-The following features are explicitly excluded from V1:
+- Record runs by date
+- Track consistency and personal history
+- View trends through clear charts
+- Export and import local backups
+
+---
+
+## Non-Goals
 
 - Multi-user support
-- Login or authentication
-- Cloud synchronization
-- Wearable integrations
-- GPS tracking
-- Route mapping
-- Heart rate monitoring
-- Calories calculation
-- Achievement systems
-- Streak systems
-- Notifications
+- Login/authentication
+- Cloud sync
+- Wearables/GPS/routes
+- Challenges, streak pressure, badges
 - AI coaching
-- Social features
+- Social networking
 
 ---
 
-# Platform
+## Platform
 
 - Android only
-- Kotlin
-- Jetpack Compose
-- Room Database (SQLite)
-- Material 3 UI
+- Kotlin + Jetpack Compose (Material 3)
+- Room (SQLite)
 
 ---
 
-# First Launch Experience
+## First Launch
 
-On first launch, the application should display a profile setup screen.
+On first launch, user sets profile:
 
-## Profile Fields
+- Name (required)
+- Height (required)
+- Gender (required)
 
-### Required
-
-- Name
-- Height (cm)
-- Gender
-
-### Storage
-
-Profile data should be stored locally.
-
-Profile information is used for BMI calculations.
+Profile is stored locally and used for BMI.
 
 ---
 
-# Main Screen
+## Main Experience
 
-The main screen should display a monthly calendar view.
+- Monthly calendar home view
+- One run entry per date
+- Quick add/edit flow
+- Run detail view
+- Statistics charts for distance, speed, weight, BMI
 
-## Top App Bar
+---
 
-Title:
+## Run Entry
 
-RunTracker
+Fields:
+
+- Date (required)
+- Weight (required)
+- Distance (required)
+- Duration (required)
+- Run Type (optional, defaults to Outdoor)
+- Notes (optional)
+
+Run Type values:
+
+- Outdoor
+- Treadmill
+
+---
+
+## Units
+
+Settings includes a Units section with:
+
+- Metric: cm, kg, km
+- Imperial: ft/in, lb, miles
+- Custom: independent selection per metric
+
+Storage rule:
+
+- Internal values remain metric only: heightCm, weightKg, distanceKm
+- Conversion happens at UI layer only
+
+---
+
+## Settings
+
+Settings includes:
+
+- Profile: name, height, gender
+- Units: Metric/Imperial/Custom
+- Appearance: dark mode toggle (default app mode is light)
+- Data: Export/Import JSON backup
+- About: app name, version, Powered by Upstead email action
+
+Powered by Upstead behavior:
+
+- Opens Android email chooser
+- To: contact@upstead.ai
+- Subject: RunTracker Feedback
+- Gracefully handles no email app case
+
+---
+
+## Backup Reminder
+
+Show gentle reminder only when either condition is met:
+
+- 100 runs since last reminder handling
+- 6 months since last reminder handling
+
+Reminder text:
+
+"Consider exporting a backup of your RunTracker data."
 
 Actions:
 
-- Statistics Icon
-- Settings Icon
+- Later
+- Export Backup
+
+State is stored locally to avoid repeated nagging.
 
 ---
 
-# Calendar View
+## Rating Prompt (Google In-App Review)
 
-The calendar is the primary navigation component.
+Use Google Play In-App Review API only (no manual Play Store redirect).
 
-## Calendar Behavior
+Show only when all are true:
 
-### Date without Run Entry
+- App installed at least 7 days
+- User recorded at least 5 runs
+- User has not already been prompted successfully
+- User has not selected Don't Ask Again
 
-Selecting a date should show:
+Dialog:
 
-- No run recorded
-- Add Run action
+- Title: Enjoying RunTracker?
+- Message about usefulness and rating request
+- Actions: Rate App, Maybe Later, Don't Ask Again
 
-### Date with Run Entry
+Behavior:
 
-Dates containing a run entry should display an indicator (dot or marker).
+- Rate App: launch In-App Review flow; if launch succeeds, mark prompted
+- Maybe Later: defer eligibility until 30 additional days OR 25 additional runs
+- Don't Ask Again: permanently disable future prompts
 
-Selecting the date should display run details.
-
----
-
-# Floating Action Button
-
-A single global Floating Action Button (FAB) should be displayed.
-
-Purpose:
-
-Add a new run entry.
-
-Default selected date:
-
-Current date.
+No analytics, incentives, or feature gating.
 
 ---
 
-# Run Entry
+## Data and Compatibility
 
-Each date can contain a maximum of one run record.
+Room data model:
 
-## Fields
-
-### Required
-
-- Date
-- Weight (kg)
-- Distance (km)
-- Duration
-
-### Optional
-
-- Notes
-
----
-
-# View Run Screen
-
-Selecting a date with a run should display:
-
-- Date
-- Weight
-- Distance
-- Duration
-- Average Speed
-- BMI
-- Notes
-
----
-
-# Edit Run
-
-Existing run entries must be editable.
-
-The same screen should be reused for both Add and Edit operations.
-
----
-
-# Statistics Screen
-
-Displays four charts:
-
-1. Distance Progression
-2. Speed Progression
-3. Weight Progression
-4. BMI Progression
-
----
-
-# Settings Screen
-
-- Name
-- Height
-- Gender
-- Export Data
-- Import Data
-
----
-
-# Database Design
-
-## Profile Table
-
-- id
-- name
-- heightCm
-- gender
-
-## RunEntry Table
-
-- id
-- date
-- weightKg
-- distanceKm
-- durationSeconds
-- notes
+- Profile: id, name, heightCm, gender
+- RunEntry: id, date, weightKg, distanceKm, durationSeconds, notes, runType
 
 Constraint:
 
 - One run per date
+
+Backup JSON:
+
+- Uses metric values internally
+- Includes runType
+- Backward compatible import for older exports where runType is missing

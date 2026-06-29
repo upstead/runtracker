@@ -9,6 +9,7 @@ import com.upstead.runtracker.model.BackupRun
 import com.upstead.runtracker.model.Gender
 import com.upstead.runtracker.model.Profile
 import com.upstead.runtracker.model.RunEntry
+import com.upstead.runtracker.model.RunType
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 
@@ -38,7 +39,8 @@ class BackupManager(
                         weightKg = it.weightKg,
                         distanceKm = it.distanceKm,
                         durationSeconds = it.durationSeconds,
-                        notes = it.notes
+                        notes = it.notes,
+                        runType = it.runType.name
                     )
                 }
             )
@@ -75,7 +77,8 @@ class BackupManager(
                         weightKg = it.weightKg,
                         distanceKm = it.distanceKm,
                         durationSeconds = it.durationSeconds,
-                        notes = it.notes
+                        notes = it.notes,
+                        runType = RunType.entries.firstOrNull { type -> type.name == it.runType } ?: RunType.OUTDOOR
                     )
                 }
             )

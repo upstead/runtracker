@@ -6,5 +6,6 @@ data class RunEntry(
     val weightKg: Double,
     val distanceKm: Double,
     val durationSeconds: Int,
-    val notes: String?
+    val notes: String?,
+    val runType: RunType = RunType.OUTDOOR
 )

@@ -2,13 +2,27 @@
 
 RunTracker is an Android app for logging running sessions and tracking progress over time using simple, date-based entries and visual trends.
 
+Design principles:
+
+- Local-first
+- No authentication
+- No cloud sync
+- No ads
+- No social features
+- No gamification
+
 ## Core Functionality
 
 - Create and update a personal profile with name, height, and gender.
-- Add, edit, and review run entries by date.
-- Track weight, distance, duration, pace/speed, and notes.
+- Add, edit, and review one run entry per date.
+- Track run type (Outdoor or Treadmill), weight, distance, duration, pace/speed, and notes.
 - View monthly calendar-based run history from the home screen.
 - Open detailed run view for any logged date.
+- Choose unit preferences from Settings:
+   - Metric: cm, kg, km
+   - Imperial: ft/in, lb, miles
+   - Custom: per-field unit selection
+- Keep all stored values in metric internally (heightCm, weightKg, distanceKm); convert only at UI level.
 - See progression charts for:
   - Distance
   - Speed
@@ -20,13 +34,38 @@ RunTracker is an Android app for logging running sessions and tracking progress 
   - Point tooltip showing date and value
   - High/Low values shown at top-right of each chart card
 - Backup and restore run/profile data using JSON import/export via Android Storage Access Framework.
-- In-app light/dark mode toggle in Settings, stored locally on device.
+- Backup reminder dialog (gentle): shown only when 100 runs or 6 months pass since last reminder handling.
+- In-app rating prompt using Google Play In-App Review API with local eligibility checks.
+- About section in Settings with app version and Powered by Upstead email action.
+- In-app light/dark mode toggle in Settings, stored locally on device (default mode is light).
+
+## Prompt Behavior
+
+- Backup reminder actions:
+   - Later
+   - Export Backup
+- Rating prompt appears only when all are true:
+   - App installed for at least 7 days
+   - User has at least 5 runs
+   - User was not already prompted successfully
+   - User did not choose Don't Ask Again
+- Rating prompt actions:
+   - Rate App (In-App Review)
+   - Maybe Later (re-eligible after 30 days or 25 additional runs)
+   - Don't Ask Again
+
+## Data Compatibility
+
+- JSON backup/import remains metric-based internally.
+- Run type is included in exports.
+- Older JSON backups without run type are still importable.
 
 ## Tech Stack
 
 - Kotlin
 - Jetpack Compose (Material 3)
 - Room (local persistence)
+- Google Play In-App Review API
 - Android Architecture Components (ViewModel, StateFlow)
 - Gradle Kotlin DSL
 

@@ -35,7 +35,7 @@ sdkmanager --version
 Step 2: Prepare the project for local builds
 
 Go to your project folder.
-cd /home/sen/workspace/upstead/website/runtracker
+cd /home/sen/workspace/upstead/github/runtracker
 
 If Gradle wrapper is missing, generate it once.
 gradle wrapper --gradle-version 8.10.2

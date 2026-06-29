@@ -29,9 +29,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.upstead.runtracker.model.RunEntry
+import com.upstead.runtracker.model.RunType
+import com.upstead.runtracker.model.UnitPreferences
 import com.upstead.runtracker.ui.components.CalendarMonthView
 import com.upstead.runtracker.ui.components.readableMonth
+import com.upstead.runtracker.util.formatDistanceFromKm
 import com.upstead.runtracker.util.formatDuration
+import com.upstead.runtracker.util.formatSpeedFromKmPerHour
 import com.upstead.runtracker.util.speedKmPerHour
 import com.upstead.runtracker.util.toDisplayDate
 import com.upstead.runtracker.util.toIsoDateString
@@ -45,6 +49,7 @@ fun HomeScreen(
     selectedDate: LocalDate,
     monthRuns: List<RunEntry>,
     selectedDateRun: RunEntry?,
+    unitPreferences: UnitPreferences,
     onPrevMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
@@ -130,7 +135,7 @@ fun HomeScreen(
                     } else {
                         val avgSpeed = speedKmPerHour(selectedDateRun.distanceKm, selectedDateRun.durationSeconds)
                         Text(
-                            text = "Distance: ${"%.2f".format(selectedDateRun.distanceKm)} km",
+                            text = "Distance: ${formatDistanceFromKm(selectedDateRun.distanceKm, unitPreferences.distanceUnit)}",
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(top = 8.dp)
                         )
@@ -139,7 +144,11 @@ fun HomeScreen(
                             style = MaterialTheme.typography.bodyLarge
                         )
                         Text(
-                            text = "Avg speed: ${"%.2f".format(avgSpeed)} km/h",
+                            text = "Avg speed: ${formatSpeedFromKmPerHour(avgSpeed, unitPreferences.distanceUnit)}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = "Type: ${if (selectedDateRun.runType == RunType.OUTDOOR) "Outdoor" else "Treadmill"}",
                             style = MaterialTheme.typography.bodyLarge
                         )
                         TextButton(

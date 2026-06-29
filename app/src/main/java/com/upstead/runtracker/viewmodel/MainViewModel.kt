@@ -7,9 +7,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.upstead.runtracker.data.backup.BackupManager
 import com.upstead.runtracker.data.repository.RunTrackerRepository
+import com.upstead.runtracker.data.settings.AppSettingsStore
 import com.upstead.runtracker.model.Gender
 import com.upstead.runtracker.model.Profile
 import com.upstead.runtracker.model.RunEntry
+import com.upstead.runtracker.model.RunType
+import com.upstead.runtracker.model.UnitPreferences
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,7 +27,8 @@ import java.time.YearMonth
 
 class MainViewModel(
     private val repository: RunTrackerRepository,
-    private val backupManager: BackupManager
+    private val backupManager: BackupManager,
+    private val settingsStore: AppSettingsStore
 ) : ViewModel() {
 
     private val _selectedMonth = MutableStateFlow(YearMonth.now())
@@ -47,6 +51,8 @@ class MainViewModel(
         SharingStarted.WhileSubscribed(5_000),
         emptyList()
     )
+
+    val unitPreferences = settingsStore.unitPreferences
 
     val monthRuns = combine(allRuns, selectedMonth) { runs, month ->
         runs.filter { run ->
@@ -102,6 +108,7 @@ class MainViewModel(
         distanceKm: Double,
         durationSeconds: Int,
         notes: String?,
+        runType: RunType,
         onDone: (() -> Unit)? = null
     ) {
         viewModelScope.launch {
@@ -116,17 +123,53 @@ class MainViewModel(
                     weightKg = weightKg,
                     distanceKm = distanceKm,
                     durationSeconds = durationSeconds,
-                    notes = notes?.trim().takeUnless { it.isNullOrBlank() }
+                    notes = notes?.trim().takeUnless { it.isNullOrBlank() },
+                    runType = runType
                 )
             )
             onDone?.invoke()
         }
     }
 
-    fun exportData(contentResolver: ContentResolver, uri: Uri) {
+    fun updateUnitPreferences(preferences: UnitPreferences) {
+        settingsStore.updateUnitPreferences(preferences)
+    }
+
+    fun shouldShowBackupReminder(totalRunCount: Int): Boolean {
+        return settingsStore.shouldShowBackupReminder(totalRunCount)
+    }
+
+    fun markBackupReminderHandled(totalRunCount: Int) {
+        settingsStore.markBackupReminderHandled(totalRunCount)
+    }
+
+    fun shouldShowRatingPrompt(totalRunCount: Int): Boolean {
+        return settingsStore.shouldShowRatingPrompt(totalRunCount)
+    }
+
+    fun markRatingPromptedSuccessfully() {
+        settingsStore.markRatingPromptedSuccessfully()
+    }
+
+    fun markRatingMaybeLater(totalRunCount: Int) {
+        settingsStore.markRatingMaybeLater(totalRunCount)
+    }
+
+    fun markRatingDontAskAgain() {
+        settingsStore.markRatingDontAskAgain()
+    }
+
+    fun postMessage(message: String) {
+        viewModelScope.launch {
+            _messages.emit(message)
+        }
+    }
+
+    fun exportData(contentResolver: ContentResolver, uri: Uri, onResult: ((Boolean) -> Unit)? = null) {
         viewModelScope.launch {
             val result = backupManager.exportToUri(contentResolver, uri)
             _messages.emit(if (result.isSuccess) "Data exported" else "Export failed")
+            onResult?.invoke(result.isSuccess)
         }
     }
 
@@ -140,12 +183,13 @@ class MainViewModel(
 
 class MainViewModelFactory(
     private val repository: RunTrackerRepository,
-    private val backupManager: BackupManager
+    private val backupManager: BackupManager,
+    private val settingsStore: AppSettingsStore
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(repository, backupManager) as T
+            return MainViewModel(repository, backupManager, settingsStore) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -7,6 +7,7 @@ import com.upstead.runtracker.data.local.RunEntryEntity
 import com.upstead.runtracker.model.Gender
 import com.upstead.runtracker.model.Profile
 import com.upstead.runtracker.model.RunEntry
+import com.upstead.runtracker.model.RunType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -61,7 +62,8 @@ private fun RunEntryEntity.toDomain() = RunEntry(
     weightKg = weightKg,
     distanceKm = distanceKm,
     durationSeconds = durationSeconds,
-    notes = notes
+    notes = notes,
+    runType = RunType.entries.firstOrNull { it.name == runType } ?: RunType.OUTDOOR
 )
 
 private fun RunEntry.toEntity() = RunEntryEntity(
@@ -70,5 +72,6 @@ private fun RunEntry.toEntity() = RunEntryEntity(
     weightKg = weightKg,
     distanceKm = distanceKm,
     durationSeconds = durationSeconds,
-    notes = notes
+    notes = notes,
+    runType = runType.name
 )
