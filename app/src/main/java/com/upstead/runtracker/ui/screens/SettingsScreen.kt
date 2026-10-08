@@ -22,6 +22,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -62,6 +63,7 @@ fun SettingsScreen(
     onDarkModeChange: (Boolean) -> Unit,
     onExport: (uri: Uri) -> Unit,
     onImport: (uri: Uri) -> Unit,
+    onRateApp: () -> Unit,
     onOpenEmailFeedback: () -> Unit
 ) {
     val context = LocalContext.current
@@ -178,7 +180,7 @@ fun SettingsScreen(
                     label = { Text("Gender") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGender) },
                     modifier = Modifier
-                        .menuAnchor()
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
@@ -226,7 +228,7 @@ fun SettingsScreen(
                     label = { Text("Unit System") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedUnitMode) },
                     modifier = Modifier
-                        .menuAnchor()
+                        .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                         .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
@@ -257,7 +259,7 @@ fun SettingsScreen(
                         label = { Text("Height Unit") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCustomHeight) },
                         modifier = Modifier
-                            .menuAnchor()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                             .fillMaxWidth()
                     )
                     ExposedDropdownMenu(
@@ -292,7 +294,7 @@ fun SettingsScreen(
                         label = { Text("Weight Unit") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCustomWeight) },
                         modifier = Modifier
-                            .menuAnchor()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                             .fillMaxWidth()
                     )
                     ExposedDropdownMenu(
@@ -327,7 +329,7 @@ fun SettingsScreen(
                         label = { Text("Distance Unit") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCustomDistance) },
                         modifier = Modifier
-                            .menuAnchor()
+                            .menuAnchor(MenuAnchorType.PrimaryNotEditable)
                             .fillMaxWidth()
                     )
                     ExposedDropdownMenu(
@@ -380,6 +382,9 @@ fun SettingsScreen(
             Text("About", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 8.dp))
             Text("RunTracker")
             Text("Version $appVersion")
+            OutlinedButton(onClick = onRateApp, modifier = Modifier.fillMaxWidth()) {
+                Text("Rate on Play Store")
+            }
             OutlinedButton(onClick = onOpenEmailFeedback, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.Email, contentDescription = null)
                 Text(" Powered by Upstead")

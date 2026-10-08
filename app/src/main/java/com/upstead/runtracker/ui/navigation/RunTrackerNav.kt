@@ -306,6 +306,29 @@ fun RunTrackerNav(
                     onImport = { uri ->
                         viewModel.importData(context.contentResolver, uri)
                     },
+                    onRateApp = {
+                        val packageName = context.packageName
+                        val marketIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("market://details?id=$packageName")
+                        ).apply {
+                            setPackage("com.android.vending")
+                        }
+                        val webIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
+                        )
+
+                        try {
+                            context.startActivity(marketIntent)
+                        } catch (_: ActivityNotFoundException) {
+                            try {
+                                context.startActivity(webIntent)
+                            } catch (_: ActivityNotFoundException) {
+                                viewModel.postMessage("Unable to open Play Store")
+                            }
+                        }
+                    },
                     onOpenEmailFeedback = {
                         val intent = Intent(Intent.ACTION_SENDTO).apply {
                             data = Uri.parse("mailto:contact@upstead.ai")
